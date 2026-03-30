@@ -1,0 +1,16 @@
+# Note - Each section beginning with 'cisco_amp:' below represents a different way you may configure pillars for cisco_amp.
+         When configuring your pillar(s), you may use any combination of subsections, but salt will not merge sections with the same heading.
+
+### Critical config options ###
+cisco_amp:
+  use: True		# If absent, the formula won't do anything at all. If True, installs and starts Cisco AMP. If False, disables and removes Cisco AMP.
+
+### Regular config options ###
+cisco_amp:
+  package_file: 'salt:///path/to_the/installer/package.ext'		# This path would be fed to you package manager on installation time.
+																# You won't need this if you install cisco_amp from a repo.
+
+### Overrides for the defaults specified by cisco_amp.map ###
+cisco_amp:
+  package_name:	name_of_the_package		# The name of the package in your package manager
+  service_name: name-of-the-service		# The name of the service in systemd/sysinit/upstart/etc.
