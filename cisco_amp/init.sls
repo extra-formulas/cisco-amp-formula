@@ -1,40 +1,42 @@
-{%- set default_sources = {'module' : 'cisco_amp', 'pillar' : True, 'grains' : ['os_family']} %}
-{%- from "./defaults/load_config.jinja" import config as cisco_amp with context %}
+{%- set default_sources = {'module' : 'cisco_amp', 'defaults' : True, 'pillar' : True, 'grains' : []} %}
+{% from "extra_formulas_common/load_config.jinja" import config as cisco_amp with context -%}
 
 {% if cisco_amp.use is defined %}
 
 {% if cisco_amp.use | to_bool %}
 
-cisco_amp_connector_installation:
+cisco-amp-connector-installed:
   pkg.installed:
     - name: {{ cisco_amp.package_name }}
-{% if cisco_amp.package_file is defined %}
-    - sources:
-      - {{ cisco_amp.package_name }}: {{ cisco_amp.package_file }}
-{% endif %}
 
-cisco_amp_service_running:  
+cisco-amp-connector-running:
   service.running:
     - name: {{ cisco_amp.service_name }}
     - enable: True
     - require:
-      - cisco_amp_connector_installation
+      - pkg: {{ cisco_amp.package_name }}
     - watch:
-      - cisco_amp_connector_installation
+      - pkg: {{ cisco_amp.package_name }}
 
 {% else %}
 
-cisco_amp_service_stopped:  
+cisco-amp-connector-stopped:
   service.dead:
     - name: {{ cisco_amp.service_name }}
     - enable: False
 
-cisco_amp_connector_removal:
+cisco-amp-connector-removed:
   pkg.removed:
     - name: {{ cisco_amp.package_name }}
     - require:
-      - cisco_amp_service_stopped
+      - service: {{ cisco_amp.service_name }}
 
 {% endif %}
+
+formula-cisco-amp-connector-is-disabled:
+  test.show_notification:
+    - text: |
+        The cisco-amp-connector formula is disabled for this host
+        You could enable it by setting the "use" flag in the pillar
 
 {% endif %}
